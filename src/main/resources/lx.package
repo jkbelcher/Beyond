@@ -1,0 +1,15 @@
+{
+  name: "Beyond",
+  mediaDir: "Beyond",
+  author: "Justin Belcher",
+  url: "https://github.com/jkbelcher/Beyond",
+
+  build: {
+    name: "@project.name@",
+    version: "@project.version@",
+    groupId: "@project.groupId@",
+    artifactId: "@project.artifactId@",
+    lxVersion: "@lx.version@",
+    buildTimestamp: "@maven.build.timestamp@"
+  }
+}
