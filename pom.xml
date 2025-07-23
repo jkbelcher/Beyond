@@ -27,9 +27,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git://github.com/jkbelcher/Beyond.git</connection>
-        <developerConnection>scm:git://github.com/jkbelcher/Beyond.git</developerConnection>
-        <url>http://github.com/jkbelcher/Beyond/tree/master</url>
+        <connection>scm:git:https://github.com/jkbelcher/Beyond.git</connection>
+        <developerConnection>scm:git:https://github.com/jkbelcher/Beyond.git</developerConnection>
+        <url>https://github.com/jkbelcher/Beyond/tree/master</url>
     <tag>v0.1.0</tag>
   </scm>
 
