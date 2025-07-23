@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>studio.jkb</groupId>
@@ -7,35 +7,52 @@
     <version>0.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
+    <licenses>
+        <license>
+            <name>Chromatik / LX Software License and Distribution Agreement</name>
+            <url>https://chromatik.co/license/</url>
+        </license>
+    </licenses>
+
     <name>Beyond</name>
-    <description>A Chromatik plugin that adds integration with the Pangolin Beyond laser control software</description>
+    <description>A Chromatik plugin that adds integration with Pangolin Beyond laser control software</description>
     <url>https://github.com/jkbelcher/Beyond</url>
     <inceptionYear>2025</inceptionYear>
     <developers>
         <developer>
             <name>Justin K. Belcher</name>
             <email>justin@jkb.studio</email>
+            <organization>JKB Studio</organization>
+            <organizationUrl>https://github.com/jkbelcher</organizationUrl>
         </developer>
     </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/jkbelcher/Beyond.git</connection>
+        <developerConnection>scm:git:git://github.com/jkbelcher/Beyond.git</developerConnection>
+        <url>http://github.com/jkbelcher/Beyond/tree/master</url>
+    </scm>
 
     <properties>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <lx.version>1.0.1-JKB.2-SNAPSHOT</lx.version>
+        <lx.version>1.1.0</lx.version>
+
         <maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
         <exec-maven-plugin.version>3.1.1</exec-maven-plugin.version>
         <maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
         <maven-source-plugin.version>3.3.0</maven-source-plugin.version>
         <maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
+        <maven-release-plugin.version>3.1.1</maven-release-plugin.version>
 
         <!-- Optionally don't copy compiled jar to ~/Chromatik/Packages -->
         <!-- Use when compiling this plugin into an uber-plugin -->
         <!-- Usage: 'mvn clean install -Dskip-chromatik-package=true' -->
         <skip-chromatik-package>false</skip-chromatik-package>
     </properties>
-    
+
     <dependencies>
         <dependency>
             <groupId>com.heronarts</groupId>
@@ -48,7 +65,7 @@
             <artifactId>glx</artifactId>
             <version>${lx.version}</version>
             <scope>provided</scope>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>com.heronarts</groupId>
             <artifactId>glxstudio</artifactId>
@@ -56,7 +73,7 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
-  	
+
     <build>
         <plugins>
             <plugin>
@@ -70,6 +87,8 @@
                     </compilerArgs>
                 </configuration>
             </plugin>
+
+            <!-- Install JAR to the local Chromatik/Packages directory -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -112,7 +131,81 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin> 
+            </plugin>
+
+            <!-- Generate -sources.jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>sources</classifier>
+                            <includes>
+                                <include>LICENSE</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Generate -javadoc.jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc-plugin.version}</version>
+                <configuration>
+                    <release>21</release>
+                    <bottom>Beyond Plugin by Justin Belcher</bottom>
+                    <doctitle>Beyond Plugin (${project.version})</doctitle>
+                    <doclint>all,-missing</doclint>
+                    <header>Beyond (${project.version})</header>
+                    <windowtitle>Beyond</windowtitle>
+                    <includeDependencySources>true</includeDependencySources>
+                    <dependencySourceIncludes>
+                        <dependencySourceInclude>studio.jkb:*</dependencySourceInclude>
+                    </dependencySourceIncludes>
+                    <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Deploy to Maven Central -->
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.8.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                    <!--
+                    <autoPublish>true</autoPublish>
+                    -->
+                </configuration>
+            </plugin>
+
+            <!-- Maven release plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>${maven-release-plugin.version}</version>
+                <configuration>
+                    <tagNameFormat>v@{project.version}</tagNameFormat>
+                    <goals>deploy</goals>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>

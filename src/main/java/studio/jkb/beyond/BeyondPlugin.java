@@ -1,3 +1,7 @@
+/**
+ * @author Justin Belcher <justin@jkb.studio>
+ */
+
 package studio.jkb.beyond;
 
 import heronarts.lx.LX;
@@ -13,6 +17,9 @@ import studio.jkb.beyond.modulator.BeyondColorModulator;
 import studio.jkb.beyond.modulator.BeyondSpeedModulator;
 import studio.jkb.uiBeyond.UIBeyondPlugin;
 
+/**
+ * Plugin for Chromatik that connects to Pangolin Beyond
+ */
 @LXPlugin.Name("Beyond")
 public class BeyondPlugin  implements LXStudio.Plugin {
 
