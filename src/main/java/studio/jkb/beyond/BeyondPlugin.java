@@ -6,6 +6,7 @@ package studio.jkb.beyond;
 
 import heronarts.lx.LX;
 import heronarts.lx.LXPlugin;
+import heronarts.lx.modulation.LXModulationEngine;
 import heronarts.lx.modulator.LXModulator;
 import heronarts.lx.osc.LXOscConnection;
 import heronarts.lx.parameter.TriggerParameter;
@@ -32,7 +33,7 @@ public class BeyondPlugin  implements LXStudio.Plugin {
 
   public final TriggerParameter setUpNow =
     new TriggerParameter("Set Up Now", this::runSetup)
-      .setDescription("Add an OSC output for BEYOND and add global modulators for brightness and color sync");
+      .setDescription("Add an OSC output for BEYOND and adds global modulators for brightness and color sync");
 
   private final LX lx;
 
@@ -77,8 +78,16 @@ public class BeyondPlugin  implements LXStudio.Plugin {
    */
   public static void registerUIComponents(LXStudio lx, LXStudio.UI ui) { }
 
+  /**
+   * Add the basic common items: OSC output, global brightness modulator, global color modulator.
+   */
   private void runSetup() {
-    // Add OSC output
+    confirmOscOutput();
+    addBrightnessModulator();
+    addColorModulator();
+  }
+
+  public void confirmOscOutput() {
     boolean hasOscOutput = false;
     for (LXOscConnection.Output output : this.lx.engine.osc.outputs) {
       if (output.hasFilter.isOn() && BEYOND_OSC_FILTER.equals(output.filter.getString())) {
@@ -98,10 +107,13 @@ public class BeyondPlugin  implements LXStudio.Plugin {
         LOG.error(e, "Failed to activate OSC output for BEYOND. Set the correct IP and port.");
       }
     }
+  }
 
-    // Add modulators to sync common parameters
+  public BeyondBrightnessModulator addBrightnessModulator() {
+    return addBrightnessModulator(this.lx.engine.modulation);
+  }
 
-    // Brightness
+  public BeyondBrightnessModulator addBrightnessModulator(LXModulationEngine modulationEngine) {
     LXModulator brightnessModulator = findModulator(BeyondBrightnessModulator.class);
     if (brightnessModulator != null) {
       // If modulator already exists, make sure it is running
@@ -114,7 +126,14 @@ public class BeyondPlugin  implements LXStudio.Plugin {
       this.lx.engine.modulation.startModulator(brightnessModulator);
     }
 
-    // Color
+    return (BeyondBrightnessModulator) brightnessModulator;
+  }
+
+  public BeyondColorModulator addColorModulator() {
+    return addColorModulator(this.lx.engine.modulation);
+  }
+
+  public BeyondColorModulator addColorModulator(LXModulationEngine modulationEngine) {
     LXModulator colorModulator = findModulator(BeyondColorModulator.class);
     if (colorModulator != null) {
       if (!colorModulator.isRunning()) {
@@ -124,6 +143,7 @@ public class BeyondPlugin  implements LXStudio.Plugin {
       colorModulator = new BeyondColorModulator(this.lx);
       this.lx.engine.modulation.startModulator(colorModulator);
     }
+    return (BeyondColorModulator) colorModulator;
   }
 
   private LXModulator findModulator(Class<? extends LXModulator> clazz) {
