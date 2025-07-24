@@ -17,14 +17,15 @@ import studio.jkb.beyond.modulator.BeyondColorModulator;
 import studio.jkb.beyond.modulator.BeyondSpeedModulator;
 import studio.jkb.uiBeyond.UIBeyondPlugin;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
 /**
  * Plugin for Chromatik that connects to Pangolin Beyond
  */
 @LXPlugin.Name("Beyond")
 public class BeyondPlugin  implements LXStudio.Plugin {
-
-  // This string must be manually updated to match the pom.xml version
-  private static final String VERSION = "0.1.0-SNAPSHOT";
 
   private static final int BEYOND_OSC_PORT = 8000;
   private static final String BEYOND_OSC_FILTER = "/b";
@@ -37,7 +38,7 @@ public class BeyondPlugin  implements LXStudio.Plugin {
 
   public BeyondPlugin(LX lx) {
     this.lx = lx;
-    LOG.log("BeyondPlugin(LX) version: " + VERSION);
+    LOG.log("BeyondPlugin(LX) version: " + loadVersion());
   }
 
   @Override
@@ -132,5 +133,23 @@ public class BeyondPlugin  implements LXStudio.Plugin {
       }
     }
     return null;
+  }
+
+  /**
+   * Loads 'beyond.properties', after maven resource filtering has been applied. Note that you
+   * may need to run `mvn clean package` once to generate the templated properties file.
+   * To verify: `cat target/classes/beyond.properties`.
+   */
+  private String loadVersion() {
+    String version = "";
+    Properties properties = new Properties();
+    try (InputStream inputStream =
+           getClass().getClassLoader().getResourceAsStream("beyond.properties")) {
+      properties.load(inputStream);
+      version = properties.getProperty("beyond.version");
+    } catch (IOException e) {
+      LOG.error("Failed to load version information " + e);
+    }
+    return version;
   }
 }
