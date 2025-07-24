@@ -33,12 +33,12 @@ public class BeyondCompoundParameter extends CompoundParameter {
     this(lx, label, beyondPath, 0, 0, 1);
   }
 
-  public BeyondCompoundParameter(LX lx, BeyondVariable path) {
-    this(lx, path.label, path.oscPath, path.defaultValue, path.min, path.max);
+  public BeyondCompoundParameter(LX lx, BeyondVariable v) {
+    this(lx, v.label, v.oscPath, v.defaultValue, v.min, v.max);
   }
 
-  public BeyondCompoundParameter(LX lx, BeyondVariable path, String label) {
-    this(lx, label, path.oscPath, path.defaultValue, path.min, path.max);
+  public BeyondCompoundParameter(LX lx, BeyondVariable v, String label) {
+    this(lx, label, v.oscPath, v.defaultValue, v.min, v.max);
   }
 
   public BeyondCompoundParameter(LX lx, String label, String beyondPath, double value, double v0, double v1) {
