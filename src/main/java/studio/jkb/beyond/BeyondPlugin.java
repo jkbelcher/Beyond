@@ -11,6 +11,7 @@ import heronarts.lx.modulator.LXModulator;
 import heronarts.lx.osc.LXOscConnection;
 import heronarts.lx.parameter.TriggerParameter;
 import heronarts.lx.studio.LXStudio;
+import heronarts.lx.utils.LXUtils;
 import studio.jkb.beyond.modulator.BeyondBpmModulator;
 import studio.jkb.beyond.modulator.BeyondBrightnessModulator;
 import studio.jkb.beyond.modulator.BeyondChannelsModulator;
@@ -87,26 +88,31 @@ public class BeyondPlugin  implements LXStudio.Plugin {
     addColorModulator();
   }
 
-  public void confirmOscOutput() {
-    boolean hasOscOutput = false;
+  public LXOscConnection.Output confirmOscOutput() {
+    return confirmOscOutput(null);
+  }
+
+  public LXOscConnection.Output confirmOscOutput(String host) {
     for (LXOscConnection.Output output : this.lx.engine.osc.outputs) {
       if (output.hasFilter.isOn() && BEYOND_OSC_FILTER.equals(output.filter.getString())) {
-        hasOscOutput = true;
-        break;
+        return output;
       }
     }
 
-    if (!hasOscOutput) {
-      LXOscConnection.Output oscOutput = this.lx.engine.osc.addOutput();
-      oscOutput.port.setValue(BEYOND_OSC_PORT);
-      oscOutput.filter.setValue(BEYOND_OSC_FILTER);
-      oscOutput.hasFilter.setValue(true);
-      try {
-        oscOutput.active.setValue(true);
-      } catch (Exception e) {
-        LOG.error(e, "Failed to activate OSC output for BEYOND. Set the correct IP and port.");
-      }
+    LXOscConnection.Output oscOutput = this.lx.engine.osc.addOutput();
+    if (!LXUtils.isEmpty(host)) {
+      oscOutput.host.setValue(host);
     }
+    oscOutput.port.setValue(BEYOND_OSC_PORT);
+    oscOutput.filter.setValue(BEYOND_OSC_FILTER);
+    oscOutput.hasFilter.setValue(true);
+    try {
+      oscOutput.active.setValue(true);
+    } catch (Exception e) {
+      LOG.error(e, "Failed to activate OSC output for BEYOND. Set the correct IP and port.");
+      return null;
+    }
+    return oscOutput;
   }
 
   public BeyondBrightnessModulator addBrightnessModulator() {
