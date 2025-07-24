@@ -74,8 +74,7 @@ public class BeyondCompoundParameter extends CompoundParameter {
     return this;
   }
 
-
-  private BeyondCompoundParameter setOutputEnabled(boolean outputEnabled) {
+  public BeyondCompoundParameter setOutputEnabled(boolean outputEnabled) {
     this.outputEnabled = outputEnabled;
     if (outputEnabled) {
       this.needsUpdate = true;
