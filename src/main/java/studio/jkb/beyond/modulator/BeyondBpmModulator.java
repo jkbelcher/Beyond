@@ -1,10 +1,8 @@
 package studio.jkb.beyond.modulator;
 
-import heronarts.glx.ui.component.UISlider;
 import heronarts.lx.LX;
 import heronarts.lx.LXCategory;
 import heronarts.lx.modulator.LXModulator;
-import heronarts.lx.parameter.LXParameter;
 import heronarts.lx.parameter.LXParameterListener;
 import heronarts.lx.studio.LXStudio;
 import heronarts.lx.studio.ui.modulation.UIModulator;
@@ -38,7 +36,6 @@ public class BeyondBpmModulator extends LXModulator implements UIModulatorContro
 
     // TODO: sync beat alignment
   }
-
 
   @Override
   protected void onStart() {
