@@ -16,7 +16,8 @@ public class UIBeyondPlugin extends UICollapsibleSection {
     this.setPadding(2, 0);
 
     addChildren(
-      new UIButton(150, 16, plugin.setUpNow)
+      new UIButton(getContentWidth(), 16, plugin.setUpNow)
+        .setBorderRounding(4)
     );
   }
 
