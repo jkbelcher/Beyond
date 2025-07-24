@@ -10,21 +10,33 @@ public class BeyondCompoundParameter extends CompoundParameter {
 
   private final LX lx;
 
+  // OSC address in beyond
   private String beyondPath;
   private boolean isValidPath = false;
-  private boolean listen = true;
+
+  // Whether parameter values will be sent to Beyond
+  private boolean outputEnabled = true;
+
+  // OSC feedback, not yet implemented
+  private boolean feedbackEnabled = false;
   private boolean registered = false;
 
+  // Last value that was sent to Beyond
   private double lastValue = 0;
+  private boolean needsUpdate = false;
 
   private final LXLoopTask checkForUpdates = new LXLoopTask() {
     @Override
     public void loop(double deltaMs) {
-      // Retrieve *potentially modulated* value, send if changed
-      double value = getValue();
-      if (lastValue != value) {
-        lastValue = value;
-        sendOscMessage(beyondPath, (float) value);
+      // Don't even query the modulated value if output is disabled
+      if (canSend()) {
+        // Retrieve *potentially modulated* value, send if changed
+        double value = getValue();
+        if (lastValue != value || needsUpdate) {
+          lastValue = value;
+          needsUpdate = false;
+          sendOscMessage(beyondPath, (float) value);
+        }
       }
     }
   };
@@ -62,17 +74,28 @@ public class BeyondCompoundParameter extends CompoundParameter {
     return this;
   }
 
+
+  private BeyondCompoundParameter setOutputEnabled(boolean outputEnabled) {
+    this.outputEnabled = outputEnabled;
+    if (outputEnabled) {
+      this.needsUpdate = true;
+    }
+    return this;
+  }
+
+  // OSC Feedback
+
   /**
    * Set whether this parameter should listen for OSC input matching its Beyond path
    */
-  private BeyondCompoundParameter setListen(boolean listen) {
-    this.listen = listen;
+  private BeyondCompoundParameter setFeedbackEnabled(boolean feedbackEnabled) {
+    this.feedbackEnabled = feedbackEnabled;
     updateRegistration();
     return this;
   }
 
   private void updateRegistration() {
-    if (this.listen) {
+    if (this.feedbackEnabled) {
       if (!this.registered) {
         register();
       }
@@ -93,25 +116,19 @@ public class BeyondCompoundParameter extends CompoundParameter {
     // TODO
   }
 
+  // Output
+
   private boolean canSend() {
-    return
-      this.isValidPath;
-      // && (this.lx != null)
-      // && (this.lx.engine != null)
-      // && (this.lx.engine.osc != null);
+    return this.isValidPath && this.outputEnabled;
   }
 
-
-  public void sendOscMessage(String address, float value) {
-    if (canSend()) {
-      lx.engine.osc.sendMessage(address, value);
-    }
+  private void sendOscMessage(String address, float value) {
+    lx.engine.osc.sendMessage(address, value);
   }
 
-  public void sendOscMessage(String address, int value) {
-    if (canSend()) {
-      lx.engine.osc.sendMessage(address, value);
-    }
+  public BeyondCompoundParameter resend() {
+    this.needsUpdate = true;
+    return this;
   }
 
   @Override
