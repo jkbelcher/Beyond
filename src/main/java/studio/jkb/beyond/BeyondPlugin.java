@@ -27,14 +27,14 @@ import java.util.Properties;
  * Plugin for Chromatik that connects to Pangolin Beyond
  */
 @LXPlugin.Name("Beyond")
-public class BeyondPlugin  implements LXStudio.Plugin {
+public class BeyondPlugin implements LXStudio.Plugin {
 
   private static final int BEYOND_OSC_PORT = 8000;
   private static final String BEYOND_OSC_FILTER = "/b";
 
   public final TriggerParameter setUpNow =
     new TriggerParameter("Set Up Now", this::runSetup)
-      .setDescription("Add an OSC output for BEYOND and adds global modulators for brightness and color sync");
+      .setDescription("Add an OSC output for BEYOND and add global modulators for brightness and color sync");
 
   private final LX lx;
 
@@ -56,7 +56,7 @@ public class BeyondPlugin  implements LXStudio.Plugin {
   @Override
   public void onUIReady(LXStudio lx, LXStudio.UI ui) {
     new UIBeyondPlugin(ui, this, ui.leftPane.content.getContentWidth())
-      .addToContainer(ui.leftPane.content);
+      .addToContainer(ui.leftPane.content, 2);
   }
 
   // Special for custom builds: register anything that would have been auto-imported from LXPackage.
@@ -83,27 +83,27 @@ public class BeyondPlugin  implements LXStudio.Plugin {
    * Add the basic common items: OSC output, global brightness modulator, global color modulator.
    */
   private void runSetup() {
-    confirmOscOutput();
+    confirmOscOutput(this.lx);
     addBrightnessModulator();
     addColorModulator();
   }
 
-  public LXOscConnection.Output confirmOscOutput() {
-    return confirmOscOutput(null);
+  public static LXOscConnection.Output confirmOscOutput(LX lx) {
+    return confirmOscOutput(lx, null, BEYOND_OSC_PORT);
   }
 
-  public LXOscConnection.Output confirmOscOutput(String host) {
-    for (LXOscConnection.Output output : this.lx.engine.osc.outputs) {
+  public static LXOscConnection.Output confirmOscOutput(LX lx, String host, int port) {
+    for (LXOscConnection.Output output : lx.engine.osc.outputs) {
       if (output.hasFilter.isOn() && BEYOND_OSC_FILTER.equals(output.filter.getString())) {
         return output;
       }
     }
 
-    LXOscConnection.Output oscOutput = this.lx.engine.osc.addOutput();
+    LXOscConnection.Output oscOutput = lx.engine.osc.addOutput();
     if (!LXUtils.isEmpty(host)) {
       oscOutput.host.setValue(host);
     }
-    oscOutput.port.setValue(BEYOND_OSC_PORT);
+    oscOutput.port.setValue(port);
     oscOutput.filter.setValue(BEYOND_OSC_FILTER);
     oscOutput.hasFilter.setValue(true);
     try {
