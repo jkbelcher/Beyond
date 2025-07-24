@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>studio.jkb</groupId>
     <artifactId>beyond</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.1.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <licenses>
@@ -28,10 +27,11 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/jkbelcher/Beyond.git</connection>
-        <developerConnection>scm:git:git://github.com/jkbelcher/Beyond.git</developerConnection>
-        <url>http://github.com/jkbelcher/Beyond/tree/master</url>
-    </scm>
+        <connection>scm:git:https://github.com/jkbelcher/Beyond.git</connection>
+        <developerConnection>scm:git:https://github.com/jkbelcher/Beyond.git</developerConnection>
+        <url>https://github.com/jkbelcher/Beyond/tree/master</url>
+    <tag>v0.1.0</tag>
+  </scm>
 
     <properties>
         <maven.compiler.release>21</maven.compiler.release>
@@ -52,6 +52,37 @@
         <!-- Usage: 'mvn clean install -Dskip-chromatik-package=true' -->
         <skip-chromatik-package>false</skip-chromatik-package>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>release-sign-artifacts</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- Generate file signatures on mvn release:perform -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>3.2.8</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <dependencies>
         <dependency>
