@@ -20,6 +20,7 @@ public class BeyondCompoundParameter extends CompoundParameter {
   private final LXLoopTask checkForUpdates = new LXLoopTask() {
     @Override
     public void loop(double deltaMs) {
+      // Retrieve *potentially modulated* value, send if changed
       double value = getValue();
       if (lastValue != value) {
         lastValue = value;
